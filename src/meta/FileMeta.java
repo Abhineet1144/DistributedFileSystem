@@ -1,23 +1,19 @@
 package meta;
 
 public class FileMeta {
-    public static final FileMeta ROOT = new FileMeta("root", FileType.FOLDER, 0, 0L, "", "", null);
+    public static final FileMeta ROOT = new FileMeta("root", FileType.FOLDER, 0, 0L,  null);
 
     private String fileName;
     private FileType type;
     private long size;
     private long date;
-    private String mainOwner;
-    private String storedPath;
     private FileMeta parent;
 
-    public FileMeta(String fileName, FileType type, int size, long date, String mainOwner, String storedPath, FileMeta parent) {
+    public FileMeta(String fileName, FileType type, int size, long date, FileMeta parent) {
         this.fileName = fileName;
         this.type = type;
         this.size = size;
         this.date = date;
-        this.mainOwner = mainOwner;
-        this.storedPath = storedPath;
         this.parent = parent;
     }
 
@@ -45,6 +41,20 @@ public class FileMeta {
         this.size = size;
     }
 
+    public void increaseSize(long size) {
+        this.size += size;
+        if (parent != null) {
+            parent.increaseSize(size);
+        }
+    }
+
+    public void decreaseSize(long size) {
+        this.size += size;
+        if (parent != null) {
+            parent.decreaseSize(size);
+        }
+    }
+
     public long getDate() {
         return date;
     }
@@ -53,27 +63,15 @@ public class FileMeta {
         this.date = date;
     }
 
-    public String getMainOwner() {
-        return mainOwner;
-    }
-
-    public void setMainOwner(String mainOwner) {
-        this.mainOwner = mainOwner;
-    }
-
-    public String getStoredPath() {
-        return storedPath;
-    }
-
-    public void setStoredPath(String storedPath) {
-        this.storedPath = storedPath;
-    }
-
     public FileMeta getParent() {
         return parent;
     }
 
     public void setParent(FileMeta parent) {
         this.parent = parent;
+    }
+
+    public String getAbsolutePath() {
+        return this.parent != null ? this.getParent().getFileName() + "/" + this.getFileName() + "/" : "";
     }
 }

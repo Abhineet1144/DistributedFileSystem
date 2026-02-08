@@ -1,4 +1,4 @@
-package handler;
+package meta.handler;
 
 import meta.FileMeta;
 
@@ -7,10 +7,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class MapFileMetaHandler implements AbstractFileHandlerMeta {
-    Map<Long, FileMeta> fileMetaMap;
+    private static final MapFileMetaHandler INSTANCE = new MapFileMetaHandler();
+
+    private static Map<Long, FileMeta> fileMetaMap;
     private static long ID;
 
-    public void Init() {
+    public static MapFileMetaHandler getInstance() {
+        return INSTANCE;
+    }
+
+    public void init() {
         fileMetaMap = new Hashtable<>();
         ID = 0;
     }
@@ -39,14 +45,5 @@ public class MapFileMetaHandler implements AbstractFileHandlerMeta {
     @Override
     public void deleteFileMeta(long ID) {
         fileMetaMap.remove(ID);
-    }
-
-    @Override
-    public void deleteFileMeta(String fileName) {
-        for (Entry<Long, FileMeta> mapElement : fileMetaMap.entrySet()) {
-            if (mapElement.getValue().getFileName().equals(fileName)) {
-                deleteFileMeta(mapElement.getKey());
-            }
-        }
     }
 }
