@@ -34,7 +34,12 @@ public class SocketIO {
     }
 
     public String recieveText() throws IOException {
-        return textInputStream.readLine();
+        while (true) {
+            String line = textInputStream.readLine();
+            if (line != null) {
+                return line;
+            }
+        }
     }
 
     public void sendInputStream(InputStream in) throws IOException {

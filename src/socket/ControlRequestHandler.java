@@ -1,13 +1,13 @@
 package socket;
 
 import meta.FileMeta;
-import meta.handler.MapFileMetaHandler;
+import meta.handler.AbstractFileHandlerMeta;
 import util.SocketIO;
 import util.Utils;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.Socket;
+import java.util.Arrays;
 
 public class ControlRequestHandler implements Runnable {
     private SocketIO operationsRequester;
@@ -19,26 +19,34 @@ public class ControlRequestHandler implements Runnable {
     @Override
     public void run() {
         try {
-            long len;
-            FileMeta parent;
-            String fileName;
-            String[] params;
-            String parentPath;
+            while (true) {
+                long len;
+                FileMeta dir;
+                FileMeta parent;
+                String fileName;
+                String[] params;
+                String parentPath;
 
-            String operation = operationsRequester.recieveText();
-            switch (operation) {
+                String operation = operationsRequester.recieveText();
+                System.out.println("Recieved oper req: " + operation);
+                params = operationsRequester.recieveText().split(":");
+                System.out.println("Recieved params: " + Arrays.toString(params));
+                switch (operation) {
+                case "list":
+                    fileName = params[0];
+                    dir = AbstractFileHandlerMeta.getInstance().getFileMetaForAbsPath(fileName);
+                    operationsRequester.sendText(StorageServerManager.getInstance().list(dir));
+                    break;
                 case "mkdir":
-                    params = operation.split(":");
                     parentPath = Utils.getCleansedPath(params[0]);
                     fileName = params[1];
-                    parent = MapFileMetaHandler.getInstance().getFileMetaForAbsPath(parentPath);
+                    parent = AbstractFileHandlerMeta.getInstance().getFileMetaForAbsPath(parentPath);
                     StorageServerManager.getInstance().createDirectory(parent, fileName);
                     break;
                 case "upload-file":
-                    params = operation.split(":");
                     parentPath = Utils.getCleansedPath(params[0]);
                     fileName = params[1];
-                    parent = MapFileMetaHandler.getInstance().getFileMetaForAbsPath(parentPath);
+                    parent = AbstractFileHandlerMeta.getInstance().getFileMetaForAbsPath(parentPath);
                     len = operationsRequester.getStreamSize();
                     operationsRequester.receiveInputStream(operationsRequester, len);
                     StorageServerManager.getInstance().uploadFile(parent, fileName, null);
@@ -49,6 +57,7 @@ public class ControlRequestHandler implements Runnable {
                     break;
                 default:
                     operationsRequester.sendText("Method not implemented: " + operation);
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -1,15 +1,26 @@
 package meta.handler;
 
+import java.util.Collection;
+
 import meta.FileMeta;
 
-public interface AbstractFileHandlerMeta {
-    void setFileMeta(FileMeta fileMeta);
+public abstract class AbstractFileHandlerMeta {
+    public abstract void setFileMeta(FileMeta fileMeta);
 
-    FileMeta getFileMeta(long ID);
+    public abstract void updateFileMeta(FileMeta fileMeta);
 
-    FileMeta getFileMeta(String fileName);
+    public abstract FileMeta getFileMeta(long ID);
 
-    void deleteFileMeta(long ID);
+    public abstract FileMeta getFileMeta(String fileName);
 
-    FileMeta getFileMetaForAbsPath(String absPath);
+    public abstract void deleteFileMeta(long ID);
+
+    public abstract FileMeta getFileMetaForAbsPath(String absPath);
+
+    public abstract Collection<FileMeta> getChildren(FileMeta dir);
+
+    public static AbstractFileHandlerMeta getInstance() {
+        return MapFileMetaHandler.getInst();
+    }
+
 }

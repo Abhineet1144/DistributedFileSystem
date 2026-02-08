@@ -2,34 +2,47 @@ package meta.handler;
 
 import meta.FileMeta;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class MapFileMetaHandler implements AbstractFileHandlerMeta {
+public class MapFileMetaHandler extends AbstractFileHandlerMeta {
     private static final MapFileMetaHandler INSTANCE = new MapFileMetaHandler();
 
     private static Map<Long, FileMeta> fileMetaMap;
-    private static long ID;
+    private static long id;
 
-    public static MapFileMetaHandler getInstance() {
+    private MapFileMetaHandler() {
+        init();
+    }
+
+    public static MapFileMetaHandler getInst() {
         return INSTANCE;
     }
 
     public void init() {
         fileMetaMap = new Hashtable<>();
-        ID = 0;
+        fileMetaMap.put(1L, FileMeta.ROOT);
+        id = 2L;
     }
 
     @Override
     public void setFileMeta(FileMeta fileMeta) {
-        fileMetaMap.put(ID, fileMeta);
-        ID++;
+        fileMetaMap.put(id, fileMeta);
+        fileMeta.setId(id);
+        id++;
     }
 
     @Override
-    public FileMeta getFileMeta(long ID) {
-        return fileMetaMap.getOrDefault(ID, null);
+    public void updateFileMeta(FileMeta fileMeta) {
+        fileMetaMap.put(fileMeta.getId(), fileMeta);
+    }
+
+    @Override
+    public FileMeta getFileMeta(long id) {
+        return fileMetaMap.getOrDefault(id, null);
     }
 
     @Override
@@ -43,17 +56,32 @@ public class MapFileMetaHandler implements AbstractFileHandlerMeta {
     }
 
     @Override
-    public void deleteFileMeta(long ID) {
-        fileMetaMap.remove(ID);
+    public void deleteFileMeta(long id) {
+        fileMetaMap.remove(id);
     }
 
     @Override
     public FileMeta getFileMetaForAbsPath(String absPath) {
         for (FileMeta meta : fileMetaMap.values()) {
+            System.out.println(meta.getAbsolutePath());
             if (absPath.equals(meta.getAbsolutePath())) {
                 return meta;
             }
         }
         return null;
+    }
+
+    @Override
+    public Collection<FileMeta> getChildren(FileMeta dir) {
+        Collection<FileMeta> children = new ArrayList<>();
+        for (FileMeta meta : fileMetaMap.values()) {
+            if (meta.equals(FileMeta.ROOT)) {
+                continue;
+            }
+            if (meta.getParent().equals(dir)) {
+                children.add(meta);
+            }
+        }
+        return children;
     }
 }

@@ -1,20 +1,29 @@
 package meta;
 
+import java.util.Collection;
+
 public class FileMeta {
-    public static final FileMeta ROOT = new FileMeta("root", FileType.FOLDER, 0, 0L,  null);
+    public static final FileMeta ROOT = new FileMeta("root", FileType.FOLDER, 0, 0L, null, "");
+    static {
+        ROOT.setId(1);
+        System.out.println(ROOT.getAbsolutePath());
+    }
 
     private String fileName;
     private FileType type;
     private long size;
     private long date;
     private FileMeta parent;
+    private long id;
+    private String ipport;
 
-    public FileMeta(String fileName, FileType type, int size, long date, FileMeta parent) {
+    public FileMeta(String fileName, FileType type, long size, long date, FileMeta parent, String ipport) {
         this.fileName = fileName;
         this.type = type;
         this.size = size;
         this.date = date;
         this.parent = parent;
+        this.ipport = ipport;
     }
 
     public String getFileName() {
@@ -72,6 +81,22 @@ public class FileMeta {
     }
 
     public String getAbsolutePath() {
-        return this.parent != null ? this.getParent().getFileName() + "/" + this.getFileName() + "/" : "";
+        return this.parent != null ? this.getParent().getAbsolutePath() + "/" + this.getFileName() + "/" : "";
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getIpport() {
+        return ipport;
+    }
+
+    public void setIpport(String ipport) {
+        this.ipport = ipport;
     }
 }

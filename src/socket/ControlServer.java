@@ -3,7 +3,6 @@ package socket;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import properties.Property;
@@ -26,7 +25,9 @@ public class ControlServer {
         try (ServerSocket serverSocket = new ServerSocket(Integer.parseInt(Property.getPort()))) {
             System.out.println("Started server in port: " + Property.getPort());
             while (true) {
-                try (Socket requester = serverSocket.accept()) {
+                Socket requester = null;
+                try {
+                    requester = serverSocket.accept();
                     System.out.println("Recieved request from: " + requester.getInetAddress());
                     Executors.newSingleThreadExecutor().execute(new ControlRequestHandler(requester));
                 } catch (IOException e) {
