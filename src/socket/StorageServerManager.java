@@ -7,7 +7,7 @@ import java.net.Socket;
 
 public class StorageServerManager {
     private StorageServerManager() {
-
+        
     }
 
     public static StorageServerManager getInstance() {
