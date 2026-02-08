@@ -19,6 +19,7 @@ public class ControlServer {
             return;
         }
 
+        started = true;
         ServerSocket serverSocket;
         try {
             serverSocket = new ServerSocket(Integer.parseInt(Property.getPort()));

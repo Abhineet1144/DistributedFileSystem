@@ -3,7 +3,7 @@ package meta;
 public class FileMeta {
     private String fileName;
     private String type;
-    private int size;
+    private long size;
     private String date;
     private String mainOwner;
     private String storedPath;
@@ -33,7 +33,7 @@ public class FileMeta {
         this.type = type;
     }
 
-    public int getSize() {
+    public long getSize() {
         return size;
     }
 
