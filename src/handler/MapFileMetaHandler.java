@@ -4,6 +4,7 @@ import meta.FileMeta;
 
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class MapFileMetaHandler implements AbstractFileHandlerMeta {
     Map<Long, FileMeta> fileMetaMap;
@@ -27,9 +28,9 @@ public class MapFileMetaHandler implements AbstractFileHandlerMeta {
 
     @Override
     public FileMeta getFileMeta(String fileName) {
-        for (Map.Entry mapElement : fileMetaMap.entrySet()) {
-            if (mapElement.getValue().equals(fileName)) {
-                return (FileMeta) mapElement.getValue();
+        for (Entry<Long, FileMeta> mapElement : fileMetaMap.entrySet()) {
+            if (mapElement.getValue().getFileName().equals(fileName)) {
+                return mapElement.getValue();
             }
         }
         return null;
@@ -42,9 +43,9 @@ public class MapFileMetaHandler implements AbstractFileHandlerMeta {
 
     @Override
     public void deleteFileMeta(String fileName) {
-        for (Map.Entry mapElement : fileMetaMap.entrySet()) {
-            if (mapElement.getValue().equals(fileName)) {
-                deleteFileMeta((Long) mapElement.getKey());
+        for (Entry<Long, FileMeta> mapElement : fileMetaMap.entrySet()) {
+            if (mapElement.getValue().getFileName().equals(fileName)) {
+                deleteFileMeta(mapElement.getKey());
             }
         }
     }

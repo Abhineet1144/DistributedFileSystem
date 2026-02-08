@@ -7,14 +7,16 @@ public class FileMeta {
     private String date;
     private String mainOwner;
     private String storedPath;
+    private FileMeta parent;
 
-    public FileMeta(String fileName, String type, int size, String date, String mainOwner, String storedPath) {
+    public FileMeta(String fileName, String type, int size, String date, String mainOwner, String storedPath, FileMeta parent) {
         this.fileName = fileName;
         this.type = type;
         this.size = size;
         this.date = date;
         this.mainOwner = mainOwner;
         this.storedPath = storedPath;
+        this.parent = parent;
     }
 
     public String getFileName() {
@@ -63,5 +65,13 @@ public class FileMeta {
 
     public void setStoredPath(String storedPath) {
         this.storedPath = storedPath;
+    }
+
+    public FileMeta getParent() {
+        return parent;
+    }
+
+    public void setParent(FileMeta parent) {
+        this.parent = parent;
     }
 }
