@@ -1,5 +1,6 @@
 package properties;
 
+import java.io.File;
 import java.io.FileInputStream;
 
 public class Property {
@@ -9,8 +10,7 @@ public class Property {
 
     public static void loadConfigurations() {
         java.util.Properties props = new java.util.Properties();
-
-        try (FileInputStream fis = new FileInputStream("./config.properties")) {
+        try (FileInputStream fis = new FileInputStream(new File("config.properties"))) {
             props.load(fis);
         } catch (Exception e) {
             throw new RuntimeException(e);

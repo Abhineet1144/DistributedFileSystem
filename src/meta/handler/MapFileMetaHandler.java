@@ -46,4 +46,14 @@ public class MapFileMetaHandler implements AbstractFileHandlerMeta {
     public void deleteFileMeta(long ID) {
         fileMetaMap.remove(ID);
     }
+
+    @Override
+    public FileMeta getFileMetaForAbsPath(String absPath) {
+        for (FileMeta meta : fileMetaMap.values()) {
+            if (absPath.equals(meta.getAbsolutePath())) {
+                return meta;
+            }
+        }
+        return null;
+    }
 }

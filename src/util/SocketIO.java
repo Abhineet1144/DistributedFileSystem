@@ -5,9 +5,10 @@ import java.net.Socket;
 
 public class SocketIO {
     private static final String OKAY_RESP = "ok";
+
+    private Socket socket;
     private BufferedReader textInputStream;
     private InputStream fileInputStream;
-
     private PrintWriter textOutputStream;
     private OutputStream fileOutputStream;
 
@@ -16,6 +17,7 @@ public class SocketIO {
         OutputStream out = socket.getOutputStream();
         socket.setSendBufferSize(256 * 1024);
         socket.setReceiveBufferSize(256 * 1024);
+        this.socket = socket;
         this.textInputStream = new BufferedReader(new InputStreamReader(in));
         this.fileInputStream = new BufferedInputStream(in);
         this.textOutputStream = new PrintWriter(out, true);
@@ -60,5 +62,15 @@ public class SocketIO {
             out.write(buffer, 0, read);
             remaining -= read;
         }
+    }
+
+    public void receiveInputStream(SocketIO socketIO, long contentSize) throws IOException {
+        receiveInputStream(socketIO.fileOutputStream, contentSize);
+    }
+
+    public void close() throws IOException {
+        textOutputStream.close();
+        fileInputStream.close();
+        socket.close();
     }
 }

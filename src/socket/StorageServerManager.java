@@ -5,7 +5,6 @@ import meta.FileType;
 import meta.handler.MapFileMetaHandler;
 import util.SocketIO;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
