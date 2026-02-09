@@ -18,7 +18,7 @@ public class Temp {
 
         socketIO.sendText(":" + file.getName());
         socketIO.sendText("in:" + file.length());
-        socketIO.sendInputStream(fs, fs.getChannel().size());
+        socketIO.sendInputStream(fs, file.length());
 
         System.out.println("Server response: " + socketIO.receiveText());
 

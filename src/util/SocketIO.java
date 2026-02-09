@@ -8,7 +8,7 @@ public class SocketIO {
 
     private Socket socket;
     private BufferedReader textInputStream;
-    private InputStream fileInputStream;
+    public InputStream fileInputStream;
     private PrintWriter textOutputStream;
     public OutputStream fileOutputStream;
 
@@ -69,7 +69,9 @@ public class SocketIO {
             out.write(buffer, 0, read);
             remaining -= read;
         }
+        out.flush(); // flush the destination stream
     }
+
 
     public void receiveInputStream(SocketIO socketIO, long contentSize) throws IOException {
         receiveInputStream(socketIO.fileOutputStream, contentSize);

@@ -37,7 +37,8 @@ public class StorageServerManager {
         AbstractFileHandlerMeta.getInstance().setFileMeta(dir);
     }
 
-    public void uploadFile(FileMeta parent, String name, SocketIO socketIO, long len) throws IOException {
+    public void uploadFile(FileMeta parent, String name, SocketIO socketIO) throws IOException {
+        long len = socketIO.getStreamSize();
         parent.increaseSize(len);
         FileMeta file = new FileMeta(name, FileType.FILE, len, System.currentTimeMillis(), parent, "");
 
@@ -48,7 +49,7 @@ public class StorageServerManager {
         storageSocket.sendText("file-creation");
         storageSocket.sendText(String.valueOf(file.getId()));
         storageSocket.sendText("in:" + len);
-        socketIO.receiveInputStream(storageSocket, len);
+        socketIO.sendInputStream(storageSocket.fileInputStream, len);
         storageSocket.fileOutputStream.flush();
     }
 
