@@ -10,7 +10,7 @@ public class SocketIO {
     private BufferedReader textInputStream;
     private InputStream fileInputStream;
     private PrintWriter textOutputStream;
-    private OutputStream fileOutputStream;
+    public OutputStream fileOutputStream;
 
     public SocketIO(Socket socket) throws IOException {
         InputStream in = socket.getInputStream();
@@ -43,11 +43,12 @@ public class SocketIO {
         }
     }
 
-    public void sendInputStream(InputStream in) throws IOException {
+    public void sendInputStream(InputStream in, long size) throws IOException {
         long available = in.available();
         String resp = sendTextAndRecieveResp("in:" + available);
         if (OKAY_RESP.equals(resp)) {
-                in.transferTo(fileOutputStream);
+            in.transferTo(fileOutputStream);
+            fileOutputStream.flush();
         }
     }
 

@@ -1,7 +1,5 @@
 package socket;
 
-import properties.Property;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -11,7 +9,7 @@ public class StorageServer {
     public static void start(int port) {
         try {
             ServerSocket serverSocket = new ServerSocket(port);
-            System.out.println("Started server in port: " + Property.getPort());
+            System.out.println("Started server in port: " + port);
             while (true) {
                 Socket requester = null;
                 try {

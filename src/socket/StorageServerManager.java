@@ -32,22 +32,24 @@ public class StorageServerManager {
         return children;
     }
 
-    public void createDirectory(FileMeta parent, String name) {
+    public void createDirectory(FileMeta parent, String name) throws IOException {
         FileMeta dir = new FileMeta(name, FileType.FOLDER, 0, System.currentTimeMillis(), parent, "");
         AbstractFileHandlerMeta.getInstance().setFileMeta(dir);
     }
 
-    public void uploadFile(FileMeta parent, String name, SocketIO socketIO) throws IOException {
-        long len = socketIO.getStreamSize();
+    public void uploadFile(FileMeta parent, String name, SocketIO socketIO, long len) throws IOException {
         parent.increaseSize(len);
         FileMeta file = new FileMeta(name, FileType.FILE, len, System.currentTimeMillis(), parent, "");
 
         SocketIO storageSocket = getFreeServerIp(len);
-        if (socketIO == null) {
+        if (storageSocket == null) {
             throw new IOException("No storage available for storing");
         }
-        storageSocket.sendText("file-creation:" + file.getId());
+        storageSocket.sendText("file-creation");
+        storageSocket.sendText(String.valueOf(file.getId()));
+        storageSocket.sendText("in:" + len);
         socketIO.receiveInputStream(storageSocket, len);
+        storageSocket.fileOutputStream.flush();
     }
 
     public void deleteFile(long id) {
