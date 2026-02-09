@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 public class Property {
     private static String mode;
     private static String port;
+    private static String dumpFile;
     private static String[] storageServers;
 
     public static void loadConfigurations() {
@@ -18,6 +19,7 @@ public class Property {
 
         mode = props.getProperty("mode");
         port = props.getProperty("port");
+        dumpFile = props.getProperty("dump.file");
         storageServers = props.getProperty("storage.sevrers").split(",");
     }
 
@@ -29,7 +31,12 @@ public class Property {
         return port;
     }
 
+    public static String getDumpFile() {
+        return dumpFile;
+    }
+
     public static String[] getStorageServers() {
         return storageServers;
     }
+
 }

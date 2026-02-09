@@ -31,6 +31,7 @@ public class SocketIO {
 
     public void sendText(String text) {
         textOutputStream.println(text);
+        System.out.println("Sent: " + text);
     }
 
     public String receiveText() throws IOException {
@@ -84,7 +85,7 @@ public class SocketIO {
 
     public void close() throws IOException {
         textOutputStream.close();
-        fileInputStream.close();
+        textInputStream.close();
         socket.close();
     }
 }

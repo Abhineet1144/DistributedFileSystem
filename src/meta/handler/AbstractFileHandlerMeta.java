@@ -19,8 +19,9 @@ public abstract class AbstractFileHandlerMeta {
 
     public abstract Collection<FileMeta> getChildren(FileMeta dir);
 
+    public abstract void getFolderTree(FileMeta dir, StringBuilder fileTree);
+
     public static AbstractFileHandlerMeta getInstance() {
         return MapFileMetaHandler.getInst();
     }
-
 }

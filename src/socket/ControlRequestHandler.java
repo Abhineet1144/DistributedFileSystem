@@ -21,6 +21,7 @@ public class ControlRequestHandler implements Runnable {
         try {
             while (true) {
                 long len;
+                StringBuilder fileTree;
                 FileMeta dir;
                 FileMeta parent;
                 String fileName;
@@ -32,6 +33,12 @@ public class ControlRequestHandler implements Runnable {
                 params = operationsRequester.receiveText().split(":");
                 System.out.println("Received params: " + Arrays.toString(params));
                 switch (operation) {
+                case "list-all":
+                    fileTree = new StringBuilder();
+                    fileName = params[0];
+                    dir = AbstractFileHandlerMeta.getInstance().getFileMetaForAbsPath(fileName);
+                    AbstractFileHandlerMeta.getInstance().getFolderTree(dir, fileTree);
+                    operationsRequester.sendText(fileTree.toString());
                 case "list":
                     fileName = params[0];
                     dir = AbstractFileHandlerMeta.getInstance().getFileMetaForAbsPath(fileName);

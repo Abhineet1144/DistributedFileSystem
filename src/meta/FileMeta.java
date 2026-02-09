@@ -1,8 +1,9 @@
 package meta;
 
-import java.util.Collection;
+import java.io.Serializable;
 
-public class FileMeta {
+public class FileMeta implements Serializable {
+    private static final long serialVersionUID = 1L;
     public static final FileMeta ROOT = new FileMeta("root", FileType.FOLDER, 0, 0L, null, "");
     static {
         ROOT.setId(1);
