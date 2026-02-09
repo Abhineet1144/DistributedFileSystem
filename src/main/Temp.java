@@ -17,6 +17,6 @@ public class Temp {
         socketIO.sendText("/new-1/:n3");
         socketIO.sendText("list");
         socketIO.sendText("");
-        System.out.println(socketIO.recieveText());
+        System.out.println(socketIO.receiveText());
     }
 }

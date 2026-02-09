@@ -26,14 +26,15 @@ public class SocketIO {
 
     public String sendTextAndRecieveResp(String text) throws IOException {
         sendText(text);
-        return recieveText();
+        return receiveText();
     }
 
     public void sendText(String text) {
         textOutputStream.println(text);
     }
 
-    public String recieveText() throws IOException {
+    // Receives text from Tomcat Server, like MKDIR and LIST
+    public String receiveText() throws IOException {
         while (true) {
             String line = textInputStream.readLine();
             if (line != null) {
@@ -51,7 +52,7 @@ public class SocketIO {
     }
 
     public long getStreamSize() throws IOException {
-        return Long.parseLong(recieveText().replace("in:", ""));
+        return Long.parseLong(receiveText().replace("in:", ""));
     }
 
     public void receiveInputStream(OutputStream out, long contentSize) throws IOException {

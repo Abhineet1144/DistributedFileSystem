@@ -27,10 +27,10 @@ public class ControlRequestHandler implements Runnable {
                 String[] params;
                 String parentPath;
 
-                String operation = operationsRequester.recieveText();
-                System.out.println("Recieved oper req: " + operation);
-                params = operationsRequester.recieveText().split(":");
-                System.out.println("Recieved params: " + Arrays.toString(params));
+                String operation = operationsRequester.receiveText();
+                System.out.println("Received oper req: " + operation);
+                params = operationsRequester.receiveText().split(":");
+                System.out.println("Received params: " + Arrays.toString(params));
                 switch (operation) {
                 case "list":
                     fileName = params[0];
