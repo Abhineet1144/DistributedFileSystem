@@ -48,9 +48,7 @@ public class StorageServerManager {
         AbstractFileHandlerMeta.getInstance().setFileMeta(file);
         storageSocket.sendTextAndRecieveResp("file-creation");
         storageSocket.sendText(String.valueOf(file.getId()));
-        storageSocket.sendTextAndRecieveResp("in:" + len);
-        socketIO.receiveInputStream(storageSocket.fileOutputStream, len);
-        storageSocket.fileOutputStream.flush();
+        socketIO.receiveInputStream(storageSocket, len);
     }
 
     public void deleteFile(long id) {

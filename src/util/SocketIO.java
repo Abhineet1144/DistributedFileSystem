@@ -8,9 +8,9 @@ public class SocketIO {
 
     private Socket socket;
     private BufferedReader textInputStream;
-    public InputStream fileInputStream;
+    private InputStream fileInputStream;
     private PrintWriter textOutputStream;
-    public OutputStream fileOutputStream;
+    private OutputStream fileOutputStream;
 
     public SocketIO(Socket socket) throws IOException {
         InputStream in = socket.getInputStream();
@@ -33,7 +33,6 @@ public class SocketIO {
         textOutputStream.println(text);
     }
 
-    // Receives text from Tomcat Server, like MKDIR and LIST
     public String receiveText() throws IOException {
         while (true) {
             String line = textInputStream.readLine();
@@ -44,15 +43,21 @@ public class SocketIO {
     }
 
     public void sendInputStream(InputStream in, long size) throws IOException {
-        String resp = sendTextAndRecieveResp("in:" + size);
+        String resp = setStreamSize(size);
         if (OKAY_RESP.equals(resp)) {
             in.transferTo(fileOutputStream);
             fileOutputStream.flush();
         }
     }
 
+    public String setStreamSize(long size) throws IOException {
+        return sendTextAndRecieveResp("in:" + size);
+    }
+
     public long getStreamSize() throws IOException {
-        return Long.parseLong(receiveText().replace("in:", ""));
+        long size = Long.parseLong(receiveText().replace("in:", ""));
+        sendText(OKAY_RESP);
+        return size;
     }
 
     public void receiveInputStream(OutputStream out, long contentSize) throws IOException {
@@ -73,6 +78,7 @@ public class SocketIO {
 
 
     public void receiveInputStream(SocketIO socketIO, long contentSize) throws IOException {
+        socketIO.setStreamSize(contentSize);
         receiveInputStream(socketIO.fileOutputStream, contentSize);
     }
 

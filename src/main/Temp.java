@@ -1,5 +1,6 @@
 package main;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.Socket;
@@ -11,13 +12,11 @@ public class Temp {
         Socket socket = new Socket("localhost", 1423);
         SocketIO socketIO = new SocketIO(socket);
 
-        File file = new File("src/main/test.txt");
-        FileInputStream fs = new FileInputStream(file);
-
+        String content = "Hello world";
         socketIO.sendText("upload-file");
 
-        socketIO.sendText(":" + file.getName());
-        socketIO.sendInputStream(fs, file.length());
+        socketIO.sendText(":test.txt");
+        socketIO.sendInputStream(new ByteArrayInputStream(content.getBytes()), content.length());
         socketIO.close();
     }
 }
