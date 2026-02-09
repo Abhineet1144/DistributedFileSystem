@@ -3,7 +3,6 @@ package socket;
 import meta.FileMeta;
 import meta.FileType;
 import meta.handler.AbstractFileHandlerMeta;
-import meta.handler.MapFileMetaHandler;
 import properties.Property;
 import util.SocketIO;
 
@@ -61,16 +60,17 @@ public class StorageServerManager {
             SocketIO socketIO = null;
             try {
                 socketIO = initSocket(ipport.split(":"));
-                String resp = socketIO.sendTextAndRecieveResp("check-available");
+                socketIO.sendText("check-available");
+                String resp = socketIO.sendTextAndRecieveResp(String.valueOf(availableRequired));
                 if (RESP_OK.equals(resp)) {
                     return socketIO;
                 }
-            } catch (IOException e) {
+                socketIO.close();
                 System.out.println("Couldn't connect to storage server: " + ipport);
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-
         return null;
     }
 }

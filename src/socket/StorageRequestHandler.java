@@ -10,7 +10,7 @@ import java.net.SocketException;
 
 public class StorageRequestHandler implements Runnable {
     private SocketIO operationsRequester;
-    String absoluteRootPath = "/home/tejas/Projects/DistributedFileSystem/root/";
+    private final String absoluteRootPath = "/home/tejas/Projects/DistributedFileSystem/root";
 
     public StorageRequestHandler(Socket requester) throws IOException {
         this.operationsRequester = new SocketIO(requester);
@@ -25,13 +25,20 @@ public class StorageRequestHandler implements Runnable {
 
                 switch (operation) {
                     case "check-available":
+                        File rootDir = new File(absoluteRootPath);
+                        String requestedSize = operationsRequester.receiveText();
+                        long availableSize = rootDir.getUsableSpace();
+                        if (Long.parseLong(requestedSize) > availableSize) {
+                            operationsRequester.sendText("failed");
+                            break;
+                        }
                         operationsRequester.sendText("ok");
                         break;
                     case "file-creation":
                         operationsRequester.sendText("ok");
                         String id = operationsRequester.receiveText();
                         long len = operationsRequester.getStreamSize();
-                        File file = new File(absoluteRootPath + id + ".dat");
+                        File file = new File(absoluteRootPath + "/" + id + ".dat");
                         try (FileOutputStream fos = new FileOutputStream(file)) {
                             operationsRequester.sendText("ok");
                             operationsRequester.receiveInputStream(fos, len);

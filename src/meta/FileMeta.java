@@ -26,7 +26,8 @@ public class FileMeta {
         this.ipport = ipport;
     }
 
-    public String getFileName() {
+    public String getFileName()  {
+
         return fileName;
     }
 
