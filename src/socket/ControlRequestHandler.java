@@ -49,8 +49,7 @@ public class ControlRequestHandler implements Runnable {
                     parent = AbstractFileHandlerMeta.getInstance().getFileMetaForAbsPath(parentPath);
                     len = operationsRequester.getStreamSize();
                     operationsRequester.sendText("ok");
-                    operationsRequester.receiveInputStream(operationsRequester, len);
-                    StorageServerManager.getInstance().uploadFile(parent, fileName, operationsRequester);
+                    StorageServerManager.getInstance().uploadFile(parent, fileName, operationsRequester, len);
                     break;
                 case "delete-file":
                     break;

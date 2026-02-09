@@ -17,11 +17,7 @@ public class Temp {
         socketIO.sendText("upload-file");
 
         socketIO.sendText(":" + file.getName());
-        socketIO.sendText("in:" + file.length());
         socketIO.sendInputStream(fs, file.length());
-
-        System.out.println("Server response: " + socketIO.receiveText());
-
         socketIO.close();
     }
 }

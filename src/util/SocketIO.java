@@ -44,8 +44,7 @@ public class SocketIO {
     }
 
     public void sendInputStream(InputStream in, long size) throws IOException {
-        long available = in.available();
-        String resp = sendTextAndRecieveResp("in:" + available);
+        String resp = sendTextAndRecieveResp("in:" + size);
         if (OKAY_RESP.equals(resp)) {
             in.transferTo(fileOutputStream);
             fileOutputStream.flush();
@@ -69,7 +68,7 @@ public class SocketIO {
             out.write(buffer, 0, read);
             remaining -= read;
         }
-        out.flush(); // flush the destination stream
+        out.flush();
     }
 
 

@@ -9,7 +9,7 @@ import java.net.Socket;
 
 public class StorageRequestHandler implements Runnable {
     private SocketIO operationsRequester;
-    String absoluteRootPath = "/media/tejas/BACKUP/DistributedFileSystem/";
+    String absoluteRootPath = "/home/tejas/Projects/DistributedFileSystem/root/";
 
     public StorageRequestHandler(Socket requester) throws IOException {
         this.operationsRequester = new SocketIO(requester);
@@ -27,10 +27,11 @@ public class StorageRequestHandler implements Runnable {
                         operationsRequester.sendText("ok");
                         break;
                     case "file-creation":
+                        operationsRequester.sendText("ok");
                         String id = operationsRequester.receiveText();
                         long len = operationsRequester.getStreamSize();
                         operationsRequester.sendText("ok");
-                        File file = new File(id+".dat");
+                        File file = new File(absoluteRootPath + id + ".dat");
                         try (FileOutputStream fos = new FileOutputStream(file)) {
                             operationsRequester.receiveInputStream(fos, len);
                         }
