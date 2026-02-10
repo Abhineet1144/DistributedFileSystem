@@ -2,6 +2,8 @@ package socket;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.concurrent.Executors;
 
 import properties.Property;
 
@@ -10,7 +12,7 @@ public class ControlServer {
 
     private static boolean started = false;
 
-    public void start() {
+    public static void start() {
         if (!Property.getMode().equals(CONTROLLER)) {
             System.out.println("Current mode is not controller");
             return;
@@ -19,9 +21,20 @@ public class ControlServer {
             return;
         }
 
-        ServerSocket serverSocket;
-        try {
-            serverSocket = new ServerSocket(Integer.parseInt(Property.getPort()));
+        started = true;
+        try (ServerSocket serverSocket = new ServerSocket(Integer.parseInt(Property.getPort()))) {
+            System.out.println("Started server in port: " + Property.getPort());
+            while (true) {
+                Socket requester = null;
+                try {
+                    requester = serverSocket.accept();
+                    System.out.println("Recieved request from: " + requester.getInetAddress());
+                    Executors.newSingleThreadExecutor().execute(new ControlRequestHandler(requester));
+                } catch (IOException e) {
+                    System.out.println("Exception connecting to requester:");
+                    e.printStackTrace();
+                }
+            }
         } catch (IOException e) {
             System.out.println("Error in Socket creation:");
             e.printStackTrace();
@@ -30,6 +43,8 @@ public class ControlServer {
             System.out.println("Error in port format:");
             e.printStackTrace();
             throw new RuntimeException(e);
+        } finally {
+            System.out.println("Server stopped");
         }
     }
 }
