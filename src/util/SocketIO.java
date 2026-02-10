@@ -24,6 +24,8 @@ public class SocketIO {
         this.fileOutputStream = new BufferedOutputStream(out);
     }
 
+    public Socket getSocket() { return socket; }
+
     public String sendTextAndRecieveResp(String text) throws IOException {
         sendText(text);
         return receiveText();
@@ -76,7 +78,6 @@ public class SocketIO {
         }
         out.flush();
     }
-
 
     public void receiveInputStream(SocketIO socketIO, long contentSize) throws IOException {
         socketIO.setStreamSize(contentSize);

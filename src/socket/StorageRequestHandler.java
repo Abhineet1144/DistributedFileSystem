@@ -10,7 +10,7 @@ import java.net.SocketException;
 
 public class StorageRequestHandler implements Runnable {
     private SocketIO operationsRequester;
-    private final String absoluteRootPath = "/home/tejas/Projects/DistributedFileSystem/root";
+    String absoluteRootPath = null;
 
     public StorageRequestHandler(Socket requester) throws IOException {
         this.operationsRequester = new SocketIO(requester);
@@ -25,8 +25,9 @@ public class StorageRequestHandler implements Runnable {
 
                 switch (operation) {
                     case "check-available":
-                        File rootDir = new File(absoluteRootPath);
+                        absoluteRootPath= operationsRequester.receiveText();
                         String requestedSize = operationsRequester.receiveText();
+                        File rootDir = new File(absoluteRootPath);
                         long availableSize = rootDir.getUsableSpace();
                         if (Long.parseLong(requestedSize) > availableSize) {
                             operationsRequester.sendText("failed");
@@ -44,15 +45,14 @@ public class StorageRequestHandler implements Runnable {
                             operationsRequester.receiveInputStream(fos, len);
                         }
                         operationsRequester.close();
-                        break;
                     default:
                         operationsRequester.sendText("Method not implemented: " + operation);
                 }
             }
         } catch (SocketException e) {
-            System.out.println("Client disconnected: " + operationsRequester);
-        } catch (IOException e) {
             e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("Client disconnected");
         } finally {
             try {
                 operationsRequester.close();

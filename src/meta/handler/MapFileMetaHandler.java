@@ -115,7 +115,6 @@ public class MapFileMetaHandler extends AbstractFileHandlerMeta implements Seria
     @Override
     public FileMeta getFileMetaForAbsPath(String absPath) {
         for (FileMeta meta : fileMetaMap.values()) {
-            System.out.println(meta.getAbsolutePath());
             if (absPath.equals(meta.getAbsolutePath())) {
                 return meta;
             }

@@ -44,6 +44,8 @@ public class StorageServerManager {
         if (storageSocket == null) {
             throw new IOException("No storage available for storing");
         }
+        file.setIpport(storageSocket.getSocket().getInetAddress() + ":" + storageSocket.getSocket().getPort());
+        System.out.println(storageSocket.getSocket().getInetAddress() + ":" + storageSocket.getSocket().getPort());
         AbstractFileHandlerMeta.getInstance().setFileMeta(file);
         storageSocket.sendTextAndRecieveResp("file-creation");
         storageSocket.sendText(String.valueOf(file.getId()));
@@ -55,21 +57,32 @@ public class StorageServerManager {
     }
 
     public SocketIO getFreeServerIp(long availableRequired) {
-        String[] ipports = Property.getStorageServers();
-        for (String ipport : ipports) {
+        String[] ipPorts = Property.getStorageServers();
+        String[] paths = Property.getStoragePaths();
+
+        if (ipPorts.length != paths.length) {
+            return null;
+        }
+
+        int currIndex = 0;
+        // Each ipPorts should have its own path.
+        for (String ipport : ipPorts) {
             SocketIO socketIO = null;
             try {
                 socketIO = initSocket(ipport.split(":"));
                 socketIO.sendText("check-available");
+                socketIO.sendText(paths[currIndex]);
                 String resp = socketIO.sendTextAndRecieveResp(String.valueOf(availableRequired));
                 if (RESP_OK.equals(resp)) {
+                    // only send its respective path.
                     return socketIO;
                 }
                 socketIO.close();
-                System.out.println("Couldn't connect to storage server: " + ipport);
+                System.out.println("No storage available: " + ipport);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                System.out.println("Couldn't connect to storage server: " + ipport);
             }
+            currIndex++;
         }
         return null;
     }
