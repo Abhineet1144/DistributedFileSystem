@@ -60,6 +60,8 @@ public class ControlRequestHandler implements Runnable {
                 case "delete-file":
                     break;
                 case "download-file":
+                    fileName = params[0];
+                    StorageServerManager.getInstance().downloadFile(fileName, operationsRequester);
                     break;
                 default:
                     operationsRequester.sendText("Method not implemented: " + operation);
