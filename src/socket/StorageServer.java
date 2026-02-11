@@ -2,6 +2,7 @@ package socket;
 
 import properties.Property;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -19,6 +20,11 @@ public class StorageServer {
         } else if (started) {
             System.out.println("Already started");
             return;
+        }
+
+        File root = new File(Property.getStoragePath());
+        if (root.getUsableSpace() < Property.getAllocatedBytes()) {
+            throw new IllegalStateException("Less space available in disk");
         }
 
         started = true;

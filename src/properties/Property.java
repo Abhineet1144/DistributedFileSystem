@@ -9,6 +9,7 @@ public class Property {
     private static String dumpFile;
     private static String[] storageServers;
     private static String storagePath;
+    private static long allocatedBytes;
 
     public static void loadConfigurations() {
         java.util.Properties props = new java.util.Properties();
@@ -23,6 +24,27 @@ public class Property {
         dumpFile = props.getProperty("dump.file");
         storageServers = props.getProperty("storage.servers").split(",");
         storagePath = props.getProperty("storage.path");
+        allocatedBytes = getInBytes(props.getProperty("allocated.size"));
+    }
+
+    private static long getInBytes(String size) {
+        String prefix = size.substring(size.length() - 1);
+        long suffix = Long.parseLong(size.substring(0, size.length() - 1));
+
+        switch (prefix) {
+            case "T":
+                return suffix * 1024 * 1024 * 1024 * 1024;
+            case "G":
+                return suffix * 1024 * 1024 * 1024;
+            case "M":
+                return suffix * 1024 * 1024;
+            case "K":
+                return suffix * 1024;
+            case "B":
+                return suffix;
+            default:
+                throw new IllegalArgumentException("Invalid datatype suffix in config");
+        }
     }
 
     public static String getMode() {
@@ -43,5 +65,9 @@ public class Property {
 
     public static String getStoragePath() {
         return storagePath;
+    }
+
+    public static long getAllocatedBytes() {
+        return allocatedBytes;
     }
 }
