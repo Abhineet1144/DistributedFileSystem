@@ -24,16 +24,37 @@ public class SocketIO {
         this.fileOutputStream = new BufferedOutputStream(out);
     }
 
+    public static SocketIO getSocketIO(String ipPort) throws IOException {
+        return getSocketIO(ipPort.split(":"));
+    }
+
+    public static SocketIO getSocketIO(String[] ipPort) throws IOException {
+        Socket socket = new Socket(ipPort[0], Integer.parseInt(ipPort[1]));
+        return new SocketIO(socket);
+    }
+
     public Socket getSocket() { return socket; }
 
-    public String sendTextAndRecieveResp(String text) throws IOException {
+    public String sendTextAndRecieveResp(Object text) throws IOException {
         sendText(text);
         return receiveText();
     }
 
-    public void sendText(String text) {
+    public void sendText(Object text) {
         textOutputStream.println(text);
         System.out.println("Sent: " + text);
+    }
+
+    public void sendOkResp() {
+        sendText(OKAY_RESP);
+    }
+
+    public boolean checkForOkResp() throws IOException {
+        return OKAY_RESP.equals(receiveText());
+    }
+
+    public boolean sendAndCheckSuccess(Object text) throws IOException {
+        return OKAY_RESP.equals(sendTextAndRecieveResp(text));
     }
 
     public String receiveText() throws IOException {
@@ -59,7 +80,7 @@ public class SocketIO {
 
     public long getStreamSize() throws IOException {
         long size = Long.parseLong(receiveText().replace("in:", ""));
-        sendText(OKAY_RESP);
+        sendOkResp();
         return size;
     }
 

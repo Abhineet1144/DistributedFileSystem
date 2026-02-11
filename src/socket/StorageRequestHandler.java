@@ -1,52 +1,63 @@
 package socket;
 
+import properties.Property;
 import util.SocketIO;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 
 public class StorageRequestHandler implements Runnable {
-    private SocketIO operationsRequester;
-    String absoluteRootPath = null;
+    private SocketIO controlServerRequest;
 
     public StorageRequestHandler(Socket requester) throws IOException {
-        this.operationsRequester = new SocketIO(requester);
+        this.controlServerRequest = new SocketIO(requester);
     }
 
     @Override
     public void run() {
         try {
             while (true) {
-                String operation = operationsRequester.receiveText();
+                String operation = controlServerRequest.receiveText();
                 System.out.println("Received: " + operation);
+
+                File file;
+                String id;
 
                 switch (operation) {
                     case "check-available":
-                        absoluteRootPath= operationsRequester.receiveText();
-                        String requestedSize = operationsRequester.receiveText();
-                        File rootDir = new File(absoluteRootPath);
+                        String requestedSize = controlServerRequest.receiveText();
+                        File rootDir = new File(Property.getStoragePath());
                         long availableSize = rootDir.getUsableSpace();
                         if (Long.parseLong(requestedSize) > availableSize) {
-                            operationsRequester.sendText("failed");
+                            controlServerRequest.sendText("failed");
                             break;
                         }
-                        operationsRequester.sendText("ok");
+                        controlServerRequest.sendOkResp();
                         break;
                     case "file-creation":
-                        operationsRequester.sendText("ok");
-                        String id = operationsRequester.receiveText();
-                        long len = operationsRequester.getStreamSize();
-                        File file = new File(absoluteRootPath + "/" + id + ".dat");
+                        controlServerRequest.sendOkResp();
+                        id = controlServerRequest.receiveText();
+                        long len = controlServerRequest.getStreamSize();
+                        file = getFile(id + ".dat");
                         try (FileOutputStream fos = new FileOutputStream(file)) {
-                            operationsRequester.sendText("ok");
-                            operationsRequester.receiveInputStream(fos, len);
+                            controlServerRequest.sendOkResp();
+                            controlServerRequest.receiveInputStream(fos, len);
                         }
-                        operationsRequester.close();
+                        controlServerRequest.close();
+                        break;
+                    case "download":
+                        id = controlServerRequest.receiveText();
+                        file = getFile(id + ".dat");
+                        if (file.exists()) {
+                            controlServerRequest.sendOkResp();
+                            controlServerRequest.sendInputStream(new BufferedInputStream(new FileInputStream(file)),
+                                    file.length());
+                        } else {
+                            controlServerRequest.sendText("failed");
+                        }
                     default:
-                        operationsRequester.sendText("Method not implemented: " + operation);
+                        controlServerRequest.sendText("Method not implemented: " + operation);
                 }
             }
         } catch (SocketException e) {
@@ -55,8 +66,12 @@ public class StorageRequestHandler implements Runnable {
             System.out.println("Client disconnected");
         } finally {
             try {
-                operationsRequester.close();
+                controlServerRequest.close();
             } catch (IOException ignored) {}
         }
+    }
+
+    private File getFile(String name) {
+        return new File(Property.getStoragePath() + File.separatorChar + name);
     }
 }

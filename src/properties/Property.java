@@ -8,7 +8,7 @@ public class Property {
     private static String port;
     private static String dumpFile;
     private static String[] storageServers;
-    private static String[] storagePaths;
+    private static String storagePath;
 
     public static void loadConfigurations() {
         java.util.Properties props = new java.util.Properties();
@@ -22,7 +22,7 @@ public class Property {
         port = props.getProperty("port");
         dumpFile = props.getProperty("dump.file");
         storageServers = props.getProperty("storage.servers").split(",");
-        storagePaths = props.getProperty("storage.paths").split(",");
+        storagePath = props.getProperty("storage.path");
     }
 
     public static String getMode() {
@@ -41,11 +41,7 @@ public class Property {
         return storageServers;
     }
 
-    public static String[] getStoragePaths() {
-        return storagePaths;
-    }
-
-    public static void setStoragePaths(String[] storagePaths) {
-        Property.storagePaths = storagePaths;
+    public static String getStoragePath() {
+        return storagePath;
     }
 }

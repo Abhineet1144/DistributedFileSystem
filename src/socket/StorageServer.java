@@ -1,13 +1,29 @@
 package socket;
 
+import properties.Property;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.Executors;
 
 public class StorageServer {
-    public static void start(int port) {
+    private static final String STORAGE = "storage";
+
+    private static boolean started = false;
+
+    public static void start() {
+        if (!Property.getMode().equals(STORAGE)) {
+            System.out.println("Current mode is not controller");
+            return;
+        } else if (started) {
+            System.out.println("Already started");
+            return;
+        }
+
+        started = true;
         try {
+            int port = Integer.parseInt(Property.getPort());
             ServerSocket serverSocket = new ServerSocket(port);
             System.out.println("Started server in port: " + port);
             while (true) {
@@ -24,6 +40,12 @@ public class StorageServer {
         } catch (IOException e) {
             System.out.println("Exception connecting");
             e.printStackTrace();
+        } catch (NumberFormatException e) {
+            System.out.println("Error in port format:");
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            System.out.println("Server stopped");
         }
     }
 }

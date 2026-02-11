@@ -10,17 +10,11 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class StorageServerManager {
-    private static final String RESP_OK = "ok";
     private StorageServerManager() {
     }
 
     public static StorageServerManager getInstance() {
         return new StorageServerManager();
-    }
-
-    public SocketIO initSocket(String[] ipPort) throws IOException {
-        Socket socket = new Socket(ipPort[0], Integer.parseInt(ipPort[1]));
-        return new SocketIO(socket);
     }
 
     public String list(FileMeta folder) {
@@ -40,7 +34,7 @@ public class StorageServerManager {
         parent.increaseSize(len);
         FileMeta file = new FileMeta(name, FileType.FILE, len, System.currentTimeMillis(), parent, "");
 
-        SocketIO storageSocket = getFreeServerIp(len);
+        SocketIO storageSocket = getFreeServerSocket(len);
         if (storageSocket == null) {
             throw new IOException("No storage available for storing");
         }
@@ -56,25 +50,28 @@ public class StorageServerManager {
         AbstractFileHandlerMeta.getInstance().deleteFileMeta(id);
     }
 
-    public SocketIO getFreeServerIp(long availableRequired) {
-        String[] ipPorts = Property.getStorageServers();
-        String[] paths = Property.getStoragePaths();
-
-        if (ipPorts.length != paths.length) {
-            return null;
+    public void downloadFile(String absPath, SocketIO requesterSocket) throws IOException {
+        FileMeta meta = AbstractFileHandlerMeta.getInstance().getFileMetaForAbsPath(absPath);
+        String ipport = meta.getIpport();
+        SocketIO socketIO = SocketIO.getSocketIO(ipport);
+        socketIO.sendText("download");
+        if (socketIO.sendAndCheckSuccess(meta.getId())) {
+            long len = socketIO.getStreamSize();
+            socketIO.receiveInputStream(requesterSocket, len);
         }
+    }
+
+    public SocketIO getFreeServerSocket(long availableRequired) {
+        String[] ipPorts = Property.getStorageServers();
 
         int currIndex = 0;
         // Each ipPorts should have its own path.
         for (String ipport : ipPorts) {
-            SocketIO socketIO = null;
+            SocketIO socketIO;
             try {
-                socketIO = initSocket(ipport.split(":"));
+                socketIO = SocketIO.getSocketIO(ipport);
                 socketIO.sendText("check-available");
-                socketIO.sendText(paths[currIndex]);
-                String resp = socketIO.sendTextAndRecieveResp(String.valueOf(availableRequired));
-                if (RESP_OK.equals(resp)) {
-                    // only send its respective path.
+                if (socketIO.sendAndCheckSuccess(availableRequired)) {
                     return socketIO;
                 }
                 socketIO.close();
@@ -84,6 +81,7 @@ public class StorageServerManager {
             }
             currIndex++;
         }
-        return null;
+
+        throw new IllegalStateException("No storage available in configured all servers");
     }
 }
