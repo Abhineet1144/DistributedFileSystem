@@ -16,7 +16,7 @@ import java.util.Map.Entry;
 public class MapFileMetaHandler extends AbstractFileHandlerMeta implements Serializable {
     private static final long serialVersionUID = 1L;
     private static MapFileMetaHandler INSTANCE;
-    private static volatile  boolean writing = false;
+    private static volatile boolean writing = false;
 
     private Map<Long, FileMeta> fileMetaMap;
     private long id;

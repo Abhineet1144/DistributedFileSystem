@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class FileMeta implements Serializable {
     private static final long serialVersionUID = 1L;
     public static final FileMeta ROOT = new FileMeta("root", FileType.FOLDER, 0, 0L, null, "");
+
     static {
         ROOT.setId(1);
         System.out.println(ROOT.getAbsolutePath());
@@ -27,8 +28,7 @@ public class FileMeta implements Serializable {
         this.ipport = ipport;
     }
 
-    public String getFileName()  {
-
+    public String getFileName() {
         return fileName;
     }
 
