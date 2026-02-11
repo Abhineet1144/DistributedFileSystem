@@ -58,6 +58,8 @@ public class ControlRequestHandler implements Runnable {
                     StorageServerManager.getInstance().uploadFile(parent, fileName, operationsRequester, len);
                     break;
                 case "delete-file":
+                    fileName = params[0];
+                    StorageServerManager.getInstance().deleteFile(fileName);
                     break;
                 case "download-file":
                     fileName = params[0];

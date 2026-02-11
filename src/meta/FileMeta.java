@@ -83,7 +83,7 @@ public class FileMeta implements Serializable {
     }
 
     public String getAbsolutePath() {
-        return this.parent != null ? this.getParent().getAbsolutePath() + "/" + this.getFileName() + "/" : "";
+        return this.parent != null ? this.getParent().getAbsolutePath() + "/" + this.getFileName() : "";
     }
 
     public long getId() {

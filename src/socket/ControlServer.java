@@ -28,7 +28,7 @@ public class ControlServer {
                 Socket requester = null;
                 try {
                     requester = serverSocket.accept();
-                    System.out.println("Recieved request from: " + requester.getInetAddress());
+                    System.out.println("Received request from: " + requester.getInetAddress());
                     Executors.newSingleThreadExecutor().execute(new ControlRequestHandler(requester));
                 } catch (IOException e) {
                     System.out.println("Exception connecting to requester:");
