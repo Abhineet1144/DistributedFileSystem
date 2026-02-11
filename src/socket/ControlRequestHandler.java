@@ -33,38 +33,40 @@ public class ControlRequestHandler implements Runnable {
                 params = operationsRequester.receiveText().split(":");
                 System.out.println("Received params: " + Arrays.toString(params));
                 switch (operation) {
-                case "list-all":
-                    fileTree = new StringBuilder();
-                    fileName = params[0];
-                    dir = AbstractFileHandlerMeta.getInstance().getFileMetaForAbsPath(fileName);
-                    AbstractFileHandlerMeta.getInstance().getFolderTree(dir, fileTree);
-                    operationsRequester.sendText(fileTree.toString());
-                case "list":
-                    fileName = params[0];
-                    dir = AbstractFileHandlerMeta.getInstance().getFileMetaForAbsPath(fileName);
-                    operationsRequester.sendText(StorageServerManager.getInstance().list(dir));
-                    break;
-                case "mkdir":
-                    parentPath = Utils.getCleansedPath(params[0]);
-                    fileName = params[1];
-                    parent = AbstractFileHandlerMeta.getInstance().getFileMetaForAbsPath(parentPath);
-                    StorageServerManager.getInstance().createDirectory(parent, fileName);
-                    break;
-                case "upload-file":
-                    parentPath = Utils.getCleansedPath(params[0]);
-                    fileName = params[1];
-                    parent = AbstractFileHandlerMeta.getInstance().getFileMetaForAbsPath(parentPath);
-                    len = operationsRequester.getStreamSize();
-                    StorageServerManager.getInstance().uploadFile(parent, fileName, operationsRequester, len);
-                    break;
-                case "delete-file":
-                    break;
-                case "download-file":
-                    fileName = params[0];
-                    StorageServerManager.getInstance().downloadFile(fileName, operationsRequester);
-                    break;
-                default:
-                    operationsRequester.sendText("Method not implemented: " + operation);
+                    case "list-all":
+                        fileTree = new StringBuilder();
+                        fileName = params[0];
+                        dir = AbstractFileHandlerMeta.getInstance().getFileMetaForAbsPath(fileName);
+                        AbstractFileHandlerMeta.getInstance().getFolderTree(dir, fileTree);
+                        operationsRequester.sendText(fileTree.toString());
+                    case "list":
+                        fileName = params[0];
+                        dir = AbstractFileHandlerMeta.getInstance().getFileMetaForAbsPath(fileName);
+                        operationsRequester.sendText(StorageServerManager.getInstance().list(dir));
+                        break;
+                    case "mkdir":
+                        parentPath = Utils.getCleansedPath(params[0]);
+                        fileName = params[1];
+                        parent = AbstractFileHandlerMeta.getInstance().getFileMetaForAbsPath(parentPath);
+                        StorageServerManager.getInstance().createDirectory(parent, fileName);
+                        break;
+                    case "upload":
+                        parentPath = Utils.getCleansedPath(params[0]);
+                        fileName = params[1];
+                        parent = AbstractFileHandlerMeta.getInstance().getFileMetaForAbsPath(parentPath);
+                        len = operationsRequester.getStreamSize();
+                        StorageServerManager.getInstance().uploadFile(parent, fileName, operationsRequester, len);
+                        break;
+                    case "delete-file":
+                        fileName = params[0];
+                        StorageServerManager.getInstance().deleteFile(fileName);
+                        break;
+                    case "download-file":
+                        fileName = params[0];
+                        StorageServerManager.getInstance().downloadFile(fileName, operationsRequester);
+                        break;
+                    default:
+                        operationsRequester.sendText("Method not implemented: " + operation);
                 }
             }
         } catch (IOException e) {

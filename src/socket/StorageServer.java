@@ -8,22 +8,8 @@ import java.net.Socket;
 import java.util.concurrent.Executors;
 
 public class StorageServer {
-    private static final String STORAGE = "storage";
-
-    private static boolean started = false;
-
-    public static void start() {
-        if (!Property.getMode().equals(STORAGE)) {
-            System.out.println("Current mode is not controller");
-            return;
-        } else if (started) {
-            System.out.println("Already started");
-            return;
-        }
-
-        started = true;
+    public static void start(int port) {
         try {
-            int port = Integer.parseInt(Property.getPort());
             ServerSocket serverSocket = new ServerSocket(port);
             System.out.println("Started server in port: " + port);
             while (true) {

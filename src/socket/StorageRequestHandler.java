@@ -1,6 +1,5 @@
 package socket;
 
-import properties.Property;
 import util.SocketIO;
 
 import java.io.*;
@@ -8,17 +7,18 @@ import java.net.Socket;
 import java.net.SocketException;
 
 public class StorageRequestHandler implements Runnable {
-    private SocketIO controlServerRequest;
+    private SocketIO storageServerRequest;
+    String absoluteRootPath = null;
 
     public StorageRequestHandler(Socket requester) throws IOException {
-        this.controlServerRequest = new SocketIO(requester);
+        this.storageServerRequest = new SocketIO(requester);
     }
 
     @Override
     public void run() {
         try {
             while (true) {
-                String operation = controlServerRequest.receiveText();
+                String operation = storageServerRequest.receiveText();
                 System.out.println("Received: " + operation);
 
                 File file;
@@ -26,38 +26,52 @@ public class StorageRequestHandler implements Runnable {
 
                 switch (operation) {
                     case "check-available":
-                        String requestedSize = controlServerRequest.receiveText();
-                        File rootDir = new File(Property.getStoragePath());
+                        absoluteRootPath = storageServerRequest.receiveText();
+                        String requestedSize = storageServerRequest.receiveText();
+                        File rootDir = new File(absoluteRootPath);
                         long availableSize = rootDir.getUsableSpace();
                         if (Long.parseLong(requestedSize) > availableSize) {
-                            controlServerRequest.sendText("failed");
+                            storageServerRequest.sendFailureResp();
                             break;
                         }
-                        controlServerRequest.sendOkResp();
+                        storageServerRequest.sendOkResp();
+                        break;
+                    case "get-server":
+                        absoluteRootPath = storageServerRequest.receiveText();
+                        if (absoluteRootPath == null) {
+                            storageServerRequest.sendFailureResp();
+                            break;
+                        }
+                        storageServerRequest.sendOkResp();
                         break;
                     case "file-creation":
-                        controlServerRequest.sendOkResp();
-                        id = controlServerRequest.receiveText();
-                        long len = controlServerRequest.getStreamSize();
+                        storageServerRequest.sendOkResp();
+                        id = storageServerRequest.receiveText();
+                        long len = storageServerRequest.getStreamSize();
                         file = getFile(id + ".dat");
                         try (FileOutputStream fos = new FileOutputStream(file)) {
-                            controlServerRequest.sendOkResp();
-                            controlServerRequest.receiveInputStream(fos, len);
+                            storageServerRequest.sendOkResp();
+                            storageServerRequest.receiveInputStream(fos, len);
                         }
-                        controlServerRequest.close();
+                        storageServerRequest.close();
+                        break;
+                    case "delete":
+                        storageServerRequest.sendOkResp();
+                        storageServerRequest.sendText(absoluteRootPath);
+                        storageServerRequest.receiveText();
+                        storageServerRequest.close();
                         break;
                     case "download":
-                        id = controlServerRequest.receiveText();
+                        id = storageServerRequest.receiveText();
                         file = getFile(id + ".dat");
                         if (file.exists()) {
-                            controlServerRequest.sendOkResp();
-                            controlServerRequest.sendInputStream(new BufferedInputStream(new FileInputStream(file)),
-                                    file.length());
+                            storageServerRequest.sendOkResp();
+                            storageServerRequest.sendInputStream(new BufferedInputStream(new FileInputStream(file)), file.length());
                         } else {
-                            controlServerRequest.sendText("failed");
+                            storageServerRequest.sendText("failed");
                         }
                     default:
-                        controlServerRequest.sendText("Method not implemented: " + operation);
+                        storageServerRequest.sendText("Method not implemented: " + operation);
                 }
             }
         } catch (SocketException e) {
@@ -66,12 +80,13 @@ public class StorageRequestHandler implements Runnable {
             System.out.println("Client disconnected");
         } finally {
             try {
-                controlServerRequest.close();
-            } catch (IOException ignored) {}
+                storageServerRequest.close();
+            } catch (IOException ignored) {
+            }
         }
     }
 
     private File getFile(String name) {
-        return new File(Property.getStoragePath() + File.separatorChar + name);
+        return new File(absoluteRootPath + File.separatorChar + name);
     }
 }
