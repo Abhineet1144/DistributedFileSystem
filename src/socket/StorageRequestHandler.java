@@ -8,17 +8,17 @@ import java.net.Socket;
 import java.net.SocketException;
 
 public class StorageRequestHandler implements Runnable {
-    private SocketIO controlServerRequest;
+    private SocketIO storageServerRequest;
 
     public StorageRequestHandler(Socket requester) throws IOException {
-        this.controlServerRequest = new SocketIO(requester);
+        this.storageServerRequest = new SocketIO(requester);
     }
 
     @Override
     public void run() {
         try {
             while (true) {
-                String operation = controlServerRequest.receiveText();
+                String operation = storageServerRequest.receiveText();
                 System.out.println("Received: " + operation);
 
                 File file;
@@ -26,38 +26,46 @@ public class StorageRequestHandler implements Runnable {
 
                 switch (operation) {
                     case "check-available":
-                        String requestedSize = controlServerRequest.receiveText();
+                        String requestedSize = storageServerRequest.receiveText();
                         File rootDir = new File(Property.getStoragePath());
                         long availableSize = rootDir.getUsableSpace();
                         if (Long.parseLong(requestedSize) > availableSize) {
-                            controlServerRequest.sendText("failed");
+                            storageServerRequest.sendText("failed");
                             break;
                         }
-                        controlServerRequest.sendOkResp();
+                        storageServerRequest.sendOkResp();
                         break;
                     case "file-creation":
-                        controlServerRequest.sendOkResp();
-                        id = controlServerRequest.receiveText();
-                        long len = controlServerRequest.getStreamSize();
+                        storageServerRequest.sendOkResp();
+                        id = storageServerRequest.receiveText();
+                        long len = storageServerRequest.getStreamSize();
                         file = getFile(id + ".dat");
                         try (FileOutputStream fos = new FileOutputStream(file)) {
-                            controlServerRequest.sendOkResp();
-                            controlServerRequest.receiveInputStream(fos, len);
+                            storageServerRequest.sendOkResp();
+                            storageServerRequest.receiveInputStream(fos, len);
                         }
-                        controlServerRequest.close();
+                        storageServerRequest.close();
+                        break;
+                    case "delete":
+                        storageServerRequest.sendOkResp();
+                        storageServerRequest.sendText(Property.getStoragePath());
+                        storageServerRequest.receiveText();
+                        storageServerRequest.close();
                         break;
                     case "download":
-                        id = controlServerRequest.receiveText();
+                        id = storageServerRequest.receiveText();
                         file = getFile(id + ".dat");
                         if (file.exists()) {
-                            controlServerRequest.sendOkResp();
-                            controlServerRequest.sendInputStream(new BufferedInputStream(new FileInputStream(file)),
+                            storageServerRequest.sendOkResp();
+                            storageServerRequest.sendInputStream(new BufferedInputStream(new FileInputStream(file)),
                                     file.length());
                         } else {
-                            controlServerRequest.sendText("failed");
+                            storageServerRequest.sendText("failed");
                         }
+                        storageServerRequest.close();
+                        break;
                     default:
-                        controlServerRequest.sendText("Method not implemented: " + operation);
+                        storageServerRequest.sendText("Method not implemented: " + operation);
                 }
             }
         } catch (SocketException e) {
@@ -66,7 +74,7 @@ public class StorageRequestHandler implements Runnable {
             System.out.println("Client disconnected");
         } finally {
             try {
-                controlServerRequest.close();
+                storageServerRequest.close();
             } catch (IOException ignored) {}
         }
     }

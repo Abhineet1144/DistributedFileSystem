@@ -16,7 +16,7 @@ import java.util.Map.Entry;
 public class MapFileMetaHandler extends AbstractFileHandlerMeta implements Serializable {
     private static final long serialVersionUID = 1L;
     private static MapFileMetaHandler INSTANCE;
-    private static volatile  boolean writing = false;
+    private static volatile boolean writing = false;
 
     private Map<Long, FileMeta> fileMetaMap;
     private long id;
@@ -126,10 +126,9 @@ public class MapFileMetaHandler extends AbstractFileHandlerMeta implements Seria
     public Collection<FileMeta> getChildren(FileMeta dir) {
         Collection<FileMeta> children = new ArrayList<>();
         for (FileMeta meta : fileMetaMap.values()) {
-            if (meta.equals(FileMeta.ROOT)) {
+            if (meta.getParent() == null) {
                 continue;
-            }
-            if (meta.getParent().equals(dir)) {
+            } else if (meta.getParent().equals(dir)) {
                 children.add(meta);
             }
         }

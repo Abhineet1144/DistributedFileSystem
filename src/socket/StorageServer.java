@@ -15,7 +15,7 @@ public class StorageServer {
 
     public static void start() {
         if (!Property.getMode().equals(STORAGE)) {
-            System.out.println("Current mode is not controller");
+            System.out.println("Current mode is not Storage Server");
             return;
         } else if (started) {
             System.out.println("Already started");

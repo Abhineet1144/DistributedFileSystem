@@ -5,6 +5,7 @@ import java.net.Socket;
 
 public class SocketIO {
     private static final String OKAY_RESP = "ok";
+    private static final String Failure_RESP = "";
 
     private Socket socket;
     private BufferedReader textInputStream;
@@ -47,6 +48,10 @@ public class SocketIO {
 
     public void sendOkResp() {
         sendText(OKAY_RESP);
+    }
+
+    public void sendFailureResp() {
+        sendText(Failure_RESP);
     }
 
     public boolean checkForOkResp() throws IOException {
