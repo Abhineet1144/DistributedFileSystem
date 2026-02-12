@@ -28,14 +28,29 @@ public class StorageServerManager {
         return children;
     }
 
-    public void createDirectory(FileMeta parent, String name) throws IOException {
-        FileMeta dir = new FileMeta(name, FileType.FOLDER, 0, System.currentTimeMillis(), parent, "");
+    public void createDirectory(FileMeta parent, String folderName) throws IOException {
+        Collection<FileMeta> children = AbstractFileHandlerMeta.getInstance().getChildren(parent);
+        for (FileMeta child : children) {
+            if (folderName.equals(child.getFileName())) {
+                System.out.println("Folders cannot have duplicate names.");
+                return;
+            }
+        }
+        FileMeta dir = new FileMeta(folderName, FileType.FOLDER, 0, System.currentTimeMillis(), parent, "");
         AbstractFileHandlerMeta.getInstance().setFileMeta(dir);
+        System.out.println("Successfully created folder: " + folderName);
     }
 
-    public void uploadFile(FileMeta parent, String name, SocketIO socketIO, long len) throws IOException {
+    public void uploadFile(FileMeta parent, String fileName, SocketIO socketIO, long len) throws IOException {
+        Collection<FileMeta> children = AbstractFileHandlerMeta.getInstance().getChildren(parent);
+        for (FileMeta child : children) {
+            if (fileName.equals(child.getFileName())) {
+                System.out.println("Files cannot have duplicate names.");
+                return;
+            }
+        }
         parent.increaseSize(len);
-        FileMeta file = new FileMeta(name, FileType.FILE, len, System.currentTimeMillis(), parent, "");
+        FileMeta file = new FileMeta(fileName, FileType.FILE, len, System.currentTimeMillis(), parent, "");
 
         Entry<String, SocketIO> storageSocketEntry = getFreeServerSocket(len);
         SocketIO storageSocket = storageSocketEntry.getValue();
@@ -61,7 +76,7 @@ public class StorageServerManager {
         }
         SocketIO storageSocket = SocketIO.getSocketIO(meta.getIpport());
         if (storageSocket == null) {
-            throw new IOException("Incorrect ipPort or server is down");
+            throw new IOException("Incorrect ipPort or server is down.");
         }
         storageSocket.sendTextAndRecieveResp("delete");
         String storageServerPath = storageSocket.receiveText();
@@ -101,6 +116,6 @@ public class StorageServerManager {
             }
         }
 
-        throw new IllegalStateException("No storage available in configured all servers");
+        throw new IllegalStateException("No storage available in all configured servers");
     }
 }

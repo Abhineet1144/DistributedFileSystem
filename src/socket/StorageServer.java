@@ -15,16 +15,16 @@ public class StorageServer {
 
     public static void start() {
         if (!Property.getMode().equals(STORAGE)) {
-            System.out.println("Current mode is not Storage Server");
+            System.out.println("Current mode is not Storage Server.");
             return;
         } else if (started) {
-            System.out.println("Already started");
+            System.out.println("Already started.");
             return;
         }
 
         File root = new File(Property.getStoragePath());
         if (root.getUsableSpace() < Property.getAllocatedBytes()) {
-            throw new IllegalStateException("Less space available in disk");
+            throw new IllegalStateException("Less space available in disk.");
         }
 
         started = true;
@@ -44,14 +44,14 @@ public class StorageServer {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Exception connecting");
+            System.out.println("Exception connecting.");
             e.printStackTrace();
         } catch (NumberFormatException e) {
             System.out.println("Error in port format:");
             e.printStackTrace();
             throw new RuntimeException(e);
         } finally {
-            System.out.println("Server stopped");
+            System.out.println("Storage Server stopped.");
         }
     }
 }

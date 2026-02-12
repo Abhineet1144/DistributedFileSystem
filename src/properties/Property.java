@@ -31,20 +31,14 @@ public class Property {
         String prefix = size.substring(size.length() - 1);
         long suffix = Long.parseLong(size.substring(0, size.length() - 1));
 
-        switch (prefix) {
-            case "T":
-                return suffix * 1024 * 1024 * 1024 * 1024;
-            case "G":
-                return suffix * 1024 * 1024 * 1024;
-            case "M":
-                return suffix * 1024 * 1024;
-            case "K":
-                return suffix * 1024;
-            case "B":
-                return suffix;
-            default:
-                throw new IllegalArgumentException("Invalid datatype suffix in config");
-        }
+        return switch (prefix) {
+            case "T" -> suffix * 1024 * 1024 * 1024 * 1024;
+            case "G" -> suffix * 1024 * 1024 * 1024;
+            case "M" -> suffix * 1024 * 1024;
+            case "K" -> suffix * 1024;
+            case "B" -> suffix;
+            default -> throw new IllegalArgumentException("Invalid datatype suffix in config");
+        };
     }
 
     public static String getMode() {

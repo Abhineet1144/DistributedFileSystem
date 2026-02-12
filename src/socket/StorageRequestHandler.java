@@ -30,7 +30,7 @@ public class StorageRequestHandler implements Runnable {
                         File rootDir = new File(Property.getStoragePath());
                         long availableSize = rootDir.getUsableSpace();
                         if (Long.parseLong(requestedSize) > availableSize) {
-                            storageServerRequest.sendText("failed");
+                            storageServerRequest.sendFailureResp();
                             break;
                         }
                         storageServerRequest.sendOkResp();
@@ -60,7 +60,7 @@ public class StorageRequestHandler implements Runnable {
                             storageServerRequest.sendInputStream(new BufferedInputStream(new FileInputStream(file)),
                                     file.length());
                         } else {
-                            storageServerRequest.sendText("failed");
+                            storageServerRequest.sendFailureResp();
                         }
                         storageServerRequest.close();
                         break;
@@ -71,11 +71,12 @@ public class StorageRequestHandler implements Runnable {
         } catch (SocketException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            System.out.println("Client disconnected");
+            System.out.println("Client disconnected.");
         } finally {
             try {
                 storageServerRequest.close();
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+            }
         }
     }
 
