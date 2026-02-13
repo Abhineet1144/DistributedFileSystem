@@ -1,82 +1,65 @@
 package socket;
 
 import properties.Property;
+import socket.handler.AbstractRequestHandler;
 import util.SocketIO;
 
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 
-public class StorageRequestHandler implements Runnable {
-    private SocketIO storageServerRequest;
+public class StorageRequestHandler extends AbstractRequestHandler {
 
     public StorageRequestHandler(Socket requester) throws IOException {
-        this.storageServerRequest = new SocketIO(requester);
+        super(requester);
     }
 
     @Override
-    public void run() {
-        try {
-            while (true) {
-                String operation = storageServerRequest.receiveText();
-                System.out.println("Received: " + operation);
+    protected void handleOperation(String operation) throws IOException {
+        File file;
+        String id;
 
-                File file;
-                String id;
-
-                switch (operation) {
-                    case "check-available":
-                        String requestedSize = storageServerRequest.receiveText();
-                        File rootDir = new File(Property.getStoragePath());
-                        long availableSize = rootDir.getUsableSpace();
-                        if (Long.parseLong(requestedSize) > availableSize) {
-                            storageServerRequest.sendFailureResp();
-                            break;
-                        }
-                        storageServerRequest.sendOkResp();
-                        break;
-                    case "file-creation":
-                        storageServerRequest.sendOkResp();
-                        id = storageServerRequest.receiveText();
-                        long len = storageServerRequest.getStreamSize();
-                        file = getFile(id + ".dat");
-                        try (FileOutputStream fos = new FileOutputStream(file)) {
-                            storageServerRequest.sendOkResp();
-                            storageServerRequest.receiveInputStream(fos, len);
-                        }
-                        storageServerRequest.close();
-                        break;
-                    case "delete":
-                        storageServerRequest.sendOkResp();
-                        storageServerRequest.sendText(Property.getStoragePath());
-                        storageServerRequest.receiveText();
-                        storageServerRequest.close();
-                        break;
-                    case "download":
-                        id = storageServerRequest.receiveText();
-                        file = getFile(id + ".dat");
-                        if (file.exists()) {
-                            storageServerRequest.sendOkResp();
-                            storageServerRequest.sendInputStream(new BufferedInputStream(new FileInputStream(file)),
-                                    file.length());
-                        } else {
-                            storageServerRequest.sendFailureResp();
-                        }
-                        storageServerRequest.close();
-                        break;
-                    default:
-                        storageServerRequest.sendText("Method not implemented: " + operation);
+        switch (operation) {
+            case "check-available":
+                String requestedSize = socketIO.receiveText();
+                File rootDir = new File(Property.getStoragePath());
+                long availableSize = rootDir.getUsableSpace();
+                if (Long.parseLong(requestedSize) > availableSize) {
+                    socketIO.sendText("failed");
+                    break;
                 }
-            }
-        } catch (SocketException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            System.out.println("Client disconnected.");
-        } finally {
-            try {
-                storageServerRequest.close();
-            } catch (IOException ignored) {
-            }
+                socketIO.sendOkResp();
+                break;
+            case "file-creation":
+                socketIO.sendOkResp();
+                id = socketIO.receiveText();
+                long len = socketIO.getStreamSize();
+                file = getFile(id + ".dat");
+                try (FileOutputStream fos = new FileOutputStream(file)) {
+                    socketIO.sendOkResp();
+                    socketIO.receiveInputStream(fos, len);
+                }
+                socketIO.close();
+                break;
+            case "delete":
+                socketIO.sendOkResp();
+                socketIO.sendText(Property.getStoragePath());
+                socketIO.receiveText();
+                socketIO.close();
+                break;
+            case "download":
+                id = socketIO.receiveText();
+                file = getFile(id + ".dat");
+                if (file.exists()) {
+                    socketIO.sendOkResp();
+                    socketIO.sendInputStream(new BufferedInputStream(new FileInputStream(file)), file.length());
+                } else {
+                    socketIO.sendText("failed");
+                }
+                socketIO.close();
+                break;
+            default:
+                socketIO.sendText("Method not implemented: " + operation);
         }
     }
 
