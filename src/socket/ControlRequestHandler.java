@@ -48,6 +48,7 @@ public class ControlRequestHandler extends AbstractRequestHandler {
                 fileName = params[1];
                 parent = AbstractFileHandlerMeta.getInstance().getFileMetaForAbsPath(parentPath);
                 StorageServerManager.getInstance().createDirectory(parent, fileName);
+                socketIO.sendOkResp();
                 break;
             case "upload-file":
                 parentPath = Utils.getCleansedPath(params[0]);

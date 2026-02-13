@@ -20,7 +20,7 @@ public abstract class AbstractRequestHandler implements Runnable {
                 handleOperation(operation);
             }
         } catch (IOException e) {
-            System.out.println("Client Disconnected...");
+            System.out.println("Client Disconnected.");
         } finally {
             try {
                 socketIO.close();
