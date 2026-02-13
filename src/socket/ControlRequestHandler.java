@@ -50,6 +50,13 @@ public class ControlRequestHandler extends AbstractRequestHandler {
                 StorageServerManager.getInstance().createDirectory(parent, fileName);
                 socketIO.sendOkResp();
                 break;
+            case "exists":
+                parentPath = Utils.getCleansedPath(params[0]);
+                fileName = params[1];
+                parent = AbstractFileHandlerMeta.getInstance().getFileMetaForAbsPath(parentPath);
+                boolean exists = StorageServerManager.getInstance().exists(parent, fileName);
+                socketIO.sendText(exists);
+
             case "upload-file":
                 parentPath = Utils.getCleansedPath(params[0]);
                 fileName = params[1];

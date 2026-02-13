@@ -41,6 +41,16 @@ public class StorageServerManager {
         System.out.println("Successfully created folder: " + folderName);
     }
 
+    public boolean exists(FileMeta parent, String fileName) {
+        Collection<FileMeta> children = AbstractFileHandlerMeta.getInstance().getChildren(parent);
+        for (FileMeta child : children) {
+            if (fileName.equals(child.getFileName())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void uploadFile(FileMeta parent, String fileName, SocketIO socketIO, long len) throws IOException {
         Collection<FileMeta> children = AbstractFileHandlerMeta.getInstance().getChildren(parent);
         for (FileMeta child : children) {
