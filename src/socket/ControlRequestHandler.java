@@ -23,7 +23,7 @@ public class ControlRequestHandler extends AbstractRequestHandler {
         FileMeta dir;
         FileMeta parent;
         String fileName;
-        String[] params = new String[2];
+        String[] params;
         String parentPath;
 
         System.out.println("Received oper req: " + operation);
@@ -56,13 +56,19 @@ public class ControlRequestHandler extends AbstractRequestHandler {
                 parent = AbstractFileHandlerMeta.getInstance().getFileMetaForAbsPath(parentPath);
                 boolean exists = StorageServerManager.getInstance().exists(parent, fileName);
                 socketIO.sendText(exists);
-
             case "upload-file":
                 parentPath = Utils.getCleansedPath(params[0]);
                 fileName = params[1];
                 parent = AbstractFileHandlerMeta.getInstance().getFileMetaForAbsPath(parentPath);
                 len = socketIO.getStreamSize();
                 StorageServerManager.getInstance().uploadFile(parent, fileName, socketIO, len);
+                break;
+            case "unchunk":
+                parentPath = Utils.getCleansedPath(params[0]);
+                fileName = params[1];
+                parent = AbstractFileHandlerMeta.getInstance().getFileMetaForAbsPath(parentPath);
+                len = socketIO.getStreamSize();
+                StorageServerManager.getInstance().unchunk(parent, fileName, socketIO, len);
                 break;
             case "delete-file":
                 fileName = params[0];

@@ -9,7 +9,7 @@ import java.net.Socket;
 
 public class GatewayServer {
     private static SocketIO socketIO;
-    private static String tempFolder = "/UploadedChunkStorage";
+    private static final String tempFolder = "/UploadedChunkStorage";
     private static final String sep = ":";
 
     public GatewayServer(String host, int port) throws IOException {
@@ -30,6 +30,12 @@ public class GatewayServer {
     public static void uploadChunks(String fileName, String uploadID, InputStream inputStream, int len) throws IOException {
         socketIO.sendText("upload-file");
         socketIO.sendText(tempFolder + File.separatorChar + uploadID + sep + fileName);
+        socketIO.sendInputStream(inputStream, len);
+    }
+
+    public static void unChunk(String path, String fileName, InputStream inputStream, int len) throws IOException {
+        socketIO.sendText("unchunk");
+        socketIO.sendText(path  + sep + fileName);
         socketIO.sendInputStream(inputStream, len);
     }
 }

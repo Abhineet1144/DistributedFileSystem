@@ -74,6 +74,23 @@ public class StorageServerManager {
         socketIO.receiveInputStream(storageSocket, len);
     }
 
+    public void unchunk(FileMeta parent, String fileName, SocketIO socketIO, long len) throws IOException {
+        parent.increaseSize(len);
+        FileMeta file = null;
+        Entry<String, SocketIO> storageSocketEntry = getFreeServerSocket(len);
+        if (AbstractFileHandlerMeta.getInstance().getFileMeta(fileName) == null) {
+            file = new FileMeta(fileName, FileType.FILE, len, System.currentTimeMillis(), parent, storageSocketEntry.getKey());
+            AbstractFileHandlerMeta.getInstance().setFileMeta(file);
+        }
+        SocketIO storageSocket = storageSocketEntry.getValue();
+        if (storageSocket == null) {
+            throw new IOException("No storage available for storing");
+        }
+        storageSocket.sendTextAndRecieveResp("unChunk");
+        storageSocket.sendText(fileName);
+        socketIO.receiveInputStream(storageSocket, len);
+    }
+
     public void deleteFile(String absPath) throws IOException {
         FileMeta meta = AbstractFileHandlerMeta.getInstance().getFileMetaForAbsPath(absPath);
         if (meta.getType() == FileType.FOLDER) {

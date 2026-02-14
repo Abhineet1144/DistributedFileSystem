@@ -18,6 +18,7 @@ public class StorageRequestHandler extends AbstractRequestHandler {
     protected void handleOperation(String operation) throws IOException {
         File file;
         String id;
+        long len;
 
         switch (operation) {
             case "check-available":
@@ -33,9 +34,20 @@ public class StorageRequestHandler extends AbstractRequestHandler {
             case "file-creation":
                 socketIO.sendOkResp();
                 id = socketIO.receiveText();
-                long len = socketIO.getStreamSize();
+                len = socketIO.getStreamSize();
                 file = getFile(id + ".dat");
                 try (FileOutputStream fos = new FileOutputStream(file)) {
+                    socketIO.sendOkResp();
+                    socketIO.receiveInputStream(fos, len);
+                }
+                socketIO.close();
+                break;
+            case "unChunk":
+                socketIO.sendOkResp();
+                String fileName = socketIO.receiveText();
+                len = socketIO.getStreamSize();
+                file = getFile(fileName);
+                try (FileOutputStream fos = new FileOutputStream(file, true)) {
                     socketIO.sendOkResp();
                     socketIO.receiveInputStream(fos, len);
                 }
