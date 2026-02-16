@@ -47,10 +47,10 @@ public class StorageRequestHandler extends AbstractRequestHandler {
                 String fileName = socketIO.receiveText();
                 len = socketIO.getStreamSize();
                 file = getFile(fileName);
-                try (FileOutputStream fos = new FileOutputStream(file, true)) {
-                    socketIO.sendOkResp();
-                    socketIO.receiveInputStream(fos, len);
-                }
+                FileOutputStream fos = new FileOutputStream(file, true);
+                socketIO.sendOkResp();
+                socketIO.receiveInputStream(fos, len);
+
                 socketIO.close();
                 break;
             case "delete":

@@ -21,7 +21,6 @@ public class MapFileMetaHandler extends AbstractFileHandlerMeta implements Seria
     private Map<Long, FileMeta> fileMetaMap;
     private long id;
 
-
     static {
         init();
     }
